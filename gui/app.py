@@ -3,6 +3,7 @@ from tkinter import ttk
 from logic.handlers import on_click, load_next_image
 from logic.imageloader import ImageLoader
 from logic.imagesaver import save_to_all_same_names
+from logic.imagegenerator import generate_image_variation
 
 class ImaginatorApp(tk.Tk):
     def __init__(self):
@@ -18,15 +19,9 @@ class ImaginatorApp(tk.Tk):
         self.main_frame = ttk.Frame(self)
         self.main_frame.pack(side="top", fill="both", expand=True)
 
-        self.create_files_list_frame()
-
         self.left_frame = ttk.Frame(self.main_frame, borderwidth=0)
         self.left_frame.pack(side="left", fill="both", expand=True)
-
-        self.create_directory_select_frame()
         self.create_image_frame()
-
-        load_next_image(self.loader, self.old_image_label, self.status_label, self.new_image_label)
 
     def create_topbar(self):
         self.top_bar = ttk.Frame(self, padding=10, borderwidth=2, relief="ridge")
@@ -57,8 +52,9 @@ class ImaginatorApp(tk.Tk):
         self.old_label = ttk.Label(self.old_frame, text="OLD", font=("TkDefaultFont", 10, "bold"))
         self.old_label.pack(side="top", pady=(0, 5))
 
-        self.old_image_label = ttk.Label(self.old_frame)
+        self.old_image_label = ttk.Label(self.old_frame, anchor="center")
         self.old_image_label.pack(side="top", pady=5, fill="both", expand=True)
+
 
         self.status_label = ttk.Label(self.old_frame, text="Ready.")
         self.status_label.pack(side="top", pady=5)
@@ -71,7 +67,7 @@ class ImaginatorApp(tk.Tk):
         self.new_label = ttk.Label(self.new_frame, text="NEW", font=("TkDefaultFont", 10, "bold"))
         self.new_label.pack(side="top", pady=(0, 5))
 
-        self.new_image_label = ttk.Label(self.new_frame)
+        self.new_image_label = ttk.Label(self.new_frame, anchor="center")
         self.new_image_label.pack(side="top", pady=5, fill="both", expand=True)
 
         self.new_status_label = ttk.Label(self.new_frame, text="Preview.")
@@ -93,8 +89,16 @@ class ImaginatorApp(tk.Tk):
         self.generate_button = ttk.Button(
             self.bottom_area,
             text="Generate",
-            command=None
+            command=lambda: generate_image_variation(
+                self.old_image_label.original_image,
+                self.prompt_entry.get(),
+                self.old_image_label,
+                self.new_image_label,
+                self.new_status_label,
+                self.old_image_label.original_size[0] > self.old_image_label.original_size[1]
+            )
         )
+
         self.generate_button.pack(pady=5, fill="x")
 
         self.save_button = ttk.Button(
